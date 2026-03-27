@@ -22,7 +22,8 @@ export default async function handler(req, res) {
 
 		답변은 반드시 한국어로, 친절하고 전문적인 어조로 작성해 주세요.
 		`;
-        const apiKey = process.env.OPENAI_API_KEY;
+        const apiKey: process.env.OPENAI_API_KEY;
+		
 
         // 2. Vercel 환경변수 설정 확인
         if (!apiKey) {
