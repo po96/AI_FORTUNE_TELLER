@@ -6,7 +6,7 @@
 </div>
 
 <script>
-    // 로딩 메시지 리스트
+    // 로딩 메시지 리스트 (기존과 동일)
     const loadingMessages = [
         "밤하늘의 기운을 모으는 중입니다...",
         "생년월일시의 간지를 계산하고 있습니다...",
@@ -16,14 +16,24 @@
     ];
 
     window.onload = async () => {
-        const userData = JSON.parse(localStorage.getItem('sajuData'));
-        if (!userData) {
+        // [수정 포인트] 주소창(URL)에서 파라미터 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const userData = {
+            name: urlParams.get('name'),
+            gender: urlParams.get('gender'),
+            birthdate: urlParams.get('birthdate'),
+            calendar: urlParams.get('calendar'),
+            birthtime: urlParams.get('birthtime')
+        };
+
+        // 데이터가 하나라도 없으면 메인으로 리다이렉트
+        if (!userData.name || !userData.birthdate) {
             alert("입력 데이터가 없습니다. 메인으로 이동합니다.");
             location.href = 'index.html';
             return;
         }
 
-        // --- 메시지 애니메이션 ---
+        // --- 메시지 애니메이션 (기존과 동일) ---
         let msgIndex = 0;
         const msgElement = document.getElementById('loading-text');
         const msgInterval = setInterval(() => {
@@ -32,7 +42,7 @@
         }, 2000);
 
         try {
-            // [수정 포인트] import 대신 직접 Vercel API 엔드포인트를 호출합니다.
+            // Vercel API 호출
             const response = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -47,6 +57,8 @@
             clearInterval(msgInterval);
             document.getElementById('loading').style.display = 'none';
             document.getElementById('content').style.display = 'block';
+            
+            // GPT의 마크다운 답변을 가독성 있게 출력
             document.getElementById('analysis-result').innerText = data.result;
 
         } catch (error) {
