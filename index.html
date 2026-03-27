@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>명품 사주풀이 - 당신의 운명을 확인하세요</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <img src="images/main-logo.png" alt="사주 로고" class="main-image">
+            <h1>운명의 흐름, 사주풀이</h1>
+            <p>태어난 순간의 기운을 분석하여 당신의 길을 안내합니다.</p>
+        </header>
+
+        <section class="input-section">
+            <form id="sajuForm" action="result.html" method="GET">
+                <div class="form-group">
+                    <label for="name">이름</label>
+                    <input type="text" id="name" name="name" placeholder="이름을 입력하세요" required>
+                </div>
+
+                <div class="form-group">
+                    <label>성별</label>
+                    <div class="radio-group">
+                        <input type="radio" id="male" name="gender" value="male" checked> <label for="male">남성</label>
+                        <input type="radio" id="female" name="gender" value="female"> <label for="female">여성</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthdate">생년월일</label>
+                    <input type="date" id="birthdate" name="birthdate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="calendar">양력/음력</label>
+                    <select id="calendar" name="calendar">
+                        <option value="solar">양력</option>
+                        <option value="lunar">음력 (평달)</option>
+                        <option value="lunar_leap">음력 (윤달)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthtime">태어난 시간</label>
+                    <select id="birthtime" name="birthtime">
+                        <option value="unknown">모름</option>
+                        <option value="00">子 (23:30 ~ 01:29)</option>
+                        <option value="02">丑 (01:30 ~ 03:29)</option>
+                        <option value="22">亥 (21:30 ~ 23:29)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn">운세 결과 확인하기</button>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        // 폼 제출 시 간단한 유효성 검사나 로컬 스토리지 저장을 수행할 수 있습니다.
+        document.getElementById('sajuForm').addEventListener('submit', function(e) {
+            // 필요 시 데이터 가공 로직 추가
+        });
+    </script>
+</body>
+</html>
