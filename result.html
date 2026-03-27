@@ -18,22 +18,17 @@
 
     window.onload = async () => {
         // 1. 이전 페이지에서 저장한 데이터 가져오기
-        const userData = JSON.parse(localStorage.getItem('sajuData'));
-        
-        if (!userData) {
-            alert("입력된 정보가 없습니다.");
-            location.href = 'index.html';
-            return;
-        }
+const userData = JSON.parse(localStorage.getItem('sajuData'));
 
-        // 2. API 호출
-        const analysis = await fetchSajuAnalysis(userData);
+const response = await fetch('/api/analyze', { // Vercel은 /api/파일명이 곧 주소입니다.
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData)
+});
 
-        // 3. 화면 업데이트
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('content').style.display = 'block';
-        
-        // 줄바꿈 보존을 위해 innerHTML 대신 구분을 지어 넣거나 스타일 적용
-        document.getElementById('analysis-result').innerText = analysis;
+const data = await response.json();
+document.getElementById('analysis-result').innerText = data.result;
     };
 </script>
+
+
