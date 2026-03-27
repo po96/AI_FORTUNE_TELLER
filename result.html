@@ -1,53 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
 <div id="loading" class="loading-box">
     <div class="spinner"></div>
     <p id="loading-text">밤하늘의 기운을 모으는 중입니다...</p>
 </div>
 
-<script type="module">
-    import { fetchSajuAnalysis } from './api/analyze.js';
-
+<script>
     // 로딩 메시지 리스트
     const loadingMessages = [
         "밤하늘의 기운을 모으는 중입니다...",
         "생년월일시의 간지를 계산하고 있습니다...",
         "야자시 적용 여부를 정밀하게 확인 중입니다...",
         "귀하의 핵심 기둥인 '일주'를 분석하고 있습니다...",
-        "오행의 조화를 살피며 운세를 풀이하는 중입니다...",
         "명리학적 데이터를 바탕으로 리포트를 생성하고 있습니다..."
     ];
 
     window.onload = async () => {
         const userData = JSON.parse(localStorage.getItem('sajuData'));
-        if (!userData) { location.href = 'index.html'; return; }
+        if (!userData) {
+            alert("입력 데이터가 없습니다. 메인으로 이동합니다.");
+            location.href = 'index.html';
+            return;
+        }
 
-        // --- 메시지 변경 애니메이션 시작 ---
+        // --- 메시지 애니메이션 ---
         let msgIndex = 0;
         const msgElement = document.getElementById('loading-text');
-        
         const msgInterval = setInterval(() => {
             msgIndex = (msgIndex + 1) % loadingMessages.length;
             msgElement.innerText = loadingMessages[msgIndex];
-        }, 2500); // 2.5초마다 메시지 교체
-        // ------------------------------------
+        }, 2000);
 
         try {
-            // 실제 API 호출
+            // [수정 포인트] import 대신 직접 Vercel API 엔드포인트를 호출합니다.
             const response = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData)
             });
+
+            if (!response.ok) throw new Error('API 호출 실패');
+
             const data = await response.json();
 
-            // 메시지 변경 중지 및 결과 표시
+            // 결과 표시
             clearInterval(msgInterval);
             document.getElementById('loading').style.display = 'none';
             document.getElementById('content').style.display = 'block';
             document.getElementById('analysis-result').innerText = data.result;
 
         } catch (error) {
+            console.error(error);
             clearInterval(msgInterval);
-            msgElement.innerText = "오류가 발생했습니다. 다시 시도해 주세요.";
+            msgElement.innerText = "분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
         }
     };
 </script>
