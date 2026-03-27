@@ -22,16 +22,8 @@ export default async function handler(req, res) {
 
 		답변은 반드시 한국어로, 친절하고 전문적인 어조로 작성해 주세요.
 		`;
-        const apiKey: process.env.OPENAI_API_KEY;
+		const apiKey = process.env.OPENAI_API_KEY; // Vercel Settings에서 설정하세요.
 		
-
-        // 2. Vercel 환경변수 설정 확인
-        if (!apiKey) {
-            console.error("에러: OPENAI_API_KEY가 설정되지 않았습니다.");
-            return res.status(500).json({ 
-                error: "서버 설정 오류: Vercel 환경변수에 API Key가 등록되지 않았습니다. 대시보드를 확인해 주세요." 
-            });
-        }
 
         // 3. OpenAI API 호출
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
