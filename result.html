@@ -41,39 +41,39 @@
             msgElement.innerText = loadingMessages[msgIndex];
         }, 2000);
 
-try {
-    // 1. 절대 경로로 호출 (origin 추가)
-    const apiUrl = window.location.origin + '/api/analyze';
-    console.log("요청 주소:", apiUrl); // 디버깅용
+		try {
+			// 1. 절대 경로로 호출 (origin 추가)
+			const apiUrl = window.location.origin + '/api/analyze';
+			console.log("요청 주소:", apiUrl); // 디버깅용
 
-    const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json' 
-        },
-        body: JSON.stringify(userData)
-    });
+			const response = await fetch(apiUrl, {
+				method: 'POST',
+				headers: { 
+					'Content-Type': 'application/json',
+					'Accept': 'application/json' 
+				},
+				body: JSON.stringify(userData)
+			});
 
-    // 2. 응답 상태값 확인
-    if (!response.ok) {
-        // 서버에서 보낸 에러 메시지 본문 읽기
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP 에러! 상태코드: ${response.status}`);
-    }
+			// 2. 응답 상태값 확인
+			if (!response.ok) {
+				// 서버에서 보낸 에러 메시지 본문 읽기
+				const errorData = await response.json();
+				throw new Error(errorData.error || `HTTP 에러! 상태코드: ${response.status}`);
+			}
 
-    const data = await response.json();
+			const data = await response.json();
 
-    // 결과 표시
-    clearInterval(msgInterval);
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
-    document.getElementById('analysis-result').innerText = data.result;
+			// 결과 표시
+			clearInterval(msgInterval);
+			document.getElementById('loading').style.display = 'none';
+			document.getElementById('content').style.display = 'block';
+			document.getElementById('analysis-result').innerText = data.result;
 
-} catch (error) {
-    console.error("상세 에러 내역:", error); // 브라우저 F12 콘솔에 출력됨
-    clearInterval(msgInterval);
-    // 화면에도 구체적인 에러 이유를 표시
-    msgElement.innerHTML = `<span style="color:red;">오류 발생: ${error.message}</span>`;
+		} catch (error) {
+			console.error("상세 에러 내역:", error); // 브라우저 F12 콘솔에 출력됨
+			clearInterval(msgInterval);
+			// 화면에도 구체적인 에러 이유를 표시
+			msgElement.innerHTML = `<span style="color:red;">오류 발생: ${error.message}</span>`;
 };
 </script>
