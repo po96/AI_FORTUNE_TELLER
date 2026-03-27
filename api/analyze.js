@@ -1,73 +1,80 @@
 export default async function handler(req, res) {
-    // 1. POST 요청만 허용
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: '허용되지 않은 요청 방식입니다. (Method Not Allowed)' });
-    }
+  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-    try {
-        const userData = req.body;
-		const prompt = `
-		당신은 20년 경력의 전문 명리학자입니다. 아래 사용자의 정보를 바탕으로 단계별 사주 분석을 수행하세요.
-		
-		[사용자 정보]
-		- 이름: ${userData.name}
-		- 성별: ${userData.gender === 'male' ? '남성' : '여성'}
-		- 생년월일: ${userData.birthdate} (${userData.calendar === 'solar' ? '양력' : '음력'})
-		- 태어난 시간: ${userData.birthtime}
+  const { image } = req.body; // Base64 데이터 (data:image/jpeg;base64,...)
 
-		[요청 사항]
-		1단계 [시간 적용 확인]: 한국 표준시와 야자시(23:30~00:30) 기준을 적용하여 날짜 변경 여부를 논리적으로 설명하세요.
-		2단계 [일주 확정]: 위 기준을 적용한 정확한 일주(日柱)의 한자와 한글명을 확정하세요.
-		3단계 [기본 분석]: 확정된 일주를 바탕으로 사용자의 타고난 성격, 특징, 조언을 상세히 서술하세요.
+  try {
+    const apiKey = process.env.OPENAI_API_KEY; // Vercel Settings에서 설정하세요.
+    const apiUrl = "https://api.openai.com/v1/chat/completions";
 
-		답변은 반드시 한국어로, 친절하고 전문적인 어조로 작성해 주세요.
+    const prompt = `당신은 패션 전문가입니다.
+		다음 사진의 데일리룩 코디를 전문가적 관점에서 상세하게 설명해주세요.
+        피드백과 개선을 위한것이기 때문에 점수는 높지않아도 괜찮아요.
+		10~30 : 매칭이 잘 맞지 않는경우
+		30~50 : 너무 단순한 경우
+		50~70 : 무난한경우
+		70~90 : 스타일이 멋진경우
+		90~99 : 메이크업과 스타일이 멋진경우
+		100 : 전부 완벽한 경우
+		중요 지침:
+		1. 헤어나 메이크업은 점수에 거의 반영하지 말고, 옷의 조화(색상, 핏, 스타일)에 집중하세요.
+		2. 결과는 반드시 '점수:', '분석:', '강점:', '개선점:' 키워드를 포함하세요.
+		3. 점수는 (0~100)/100 형식으로 작성하세요.
+		4. 강점은 최소 4가지 이상, 번호를 매겨 각 항목마다
+		   - 왜 강점인지
+		   - 스타일링 측면에서 어떤 효과가 있는지
+		   를 구체적으로 설명하세요.
+		5. 개선점은 최소 3가지 이상, 번호를 매겨
+		   - 현재 아쉬운 이유
+		   - 실질적인 개선 대안(아이템, 컬러, 핏 등)
+		   을 함께 제시하세요.
+		6. 친절하지만 패션 전문가다운 전문적인 어조를 유지하세요.
+	    7. 요약정보나 재 질문은 필요없어요.
+		- totalScore: 0~100
+		- clothing: 0~80
+		- hair: 0~10
+		- makeup: 0~10
 		`;
-		const apiKey = process.env.OPENAI_API_KEY; // Vercel Settings에서 설정하세요.
-		
 
-        // 3. OpenAI API 호출
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: "gpt-4o-mini",
-                messages: [
-                    { 
-                        role: "system", 
-                        content: "당신은 전문 명리학자입니다. 사용자의 정보를 바탕으로 1단계(시간검증), 2단계(일주확정), 3단계(분석) 순으로 상세히 답하세요." 
-                    },
-                    { 
-                        role: "user", 
-                        content: `이름: ${userData.name}, 성별: ${userData.gender}, 생년월일: ${userData.birthdate}, 시간: ${userData.birthtime}, 구분: ${userData.calendar} 분석 시작해줘.` 
-                    }
-                ],
-                temperature: 0.3 // 일관된 분석을 위해 낮은 수치 권장
-            })
-        });
 
-        // 4. API 응답 상태 확인
-        const data = await response.json();
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini", // GPT-4o mini 모델 지정
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: prompt },
+              {
+                type: "image_url",
+                image_url: {
+                  url: image // 전달받은 Base64 이미지를 직접 입력
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 600 // 분석 결과 길이를 제한하여 비용 절감
+      })
+    });
 
-        if (!response.ok) {
-            console.error("OpenAI API 응답 에러:", data);
-            return res.status(response.status).json({ 
-                error: `OpenAI 에러: ${data.error?.message || '알 수 없는 오류가 발생했습니다.'}` 
-            });
-        }
-
-        // 5. 데이터 구조 검증 및 결과 반환
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-            return res.status(200).json({ result: data.choices[0].message.content });
-        } else {
-            return res.status(500).json({ error: "응답 데이터 구조가 예상과 다릅니다. (Choices 미발견)" });
-        }
-
-    } catch (err) {
-        // 6. 예기치 못한 서버 에러 처리
-        console.error("서버 내부 에러:", err);
-        return res.status(500).json({ error: `서버 내부 오류: ${err.message}` });
+    const data = await response.json();
+    
+    // API 호출 에러 처리
+    if (data.error) {
+      throw new Error(data.error.message);
     }
+
+    const resultText = data.choices[0].message.content;
+    res.status(200).json({ analysis: resultText });
+
+  } catch (error) {
+    console.error("API Error:", error);
+    res.status(500).json({ error: '분석 중 오류가 발생했습니다: ' + error.message });
+  }
 }
