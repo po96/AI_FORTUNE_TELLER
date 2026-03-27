@@ -1,17 +1,21 @@
-const OPENAI_API_KEY = `Bearer ${process.env.OPENAI_API_KEY}`; // 실제 서비스 시 환경변수로 관리 권장
 
-export async function fetchSajuAnalysis(userData) {
-    const { name, birthdate, birthtime, calendar, gender } = userData;
+export default async function handler(req, res) {
+    // 1. GET 요청인지 POST 요청인지 확인 (보통 데이터 전송은 POST 권장)
+    if (req.method !== 'POST') {
+        return res.status(405).json({ message: 'Method Not Allowed' });
+    }
 
+    try {
+	const userData = req.body; // index.html에서 보낸 데이터
     // GPT에게 보낼 정교한 프롬프트 구성
     const prompt = `
     당신은 20년 경력의 전문 명리학자입니다. 아래 사용자의 정보를 바탕으로 단계별 사주 분석을 수행하세요.
     
     [사용자 정보]
-    - 이름: ${name}
-    - 생년월일: ${birthdate} (${calendar})
-    - 태어난 시간: ${birthtime}
-    - 성별: ${gender}
+	- 이름: ${userData.name}
+	- 성별: ${userData.gender === 'male' ? '남성' : '여성'}
+	- 생년월일: ${userData.birthdate} (${userData.calendar === 'solar' ? '양력' : '음력'})
+	- 태어난 시간: ${userData.birthtime}
 
     [요청 사항]
     1단계 [시간 적용 확인]: 한국 표준시와 야자시(23:30~00:30) 기준을 적용하여 날짜 변경 여부를 논리적으로 설명하세요.
@@ -20,28 +24,30 @@ export async function fetchSajuAnalysis(userData) {
 
     답변은 반드시 한국어로, 친절하고 전문적인 어조로 작성해 주세요.
     `;
-
-    try {
+        // 2. OpenAI API 호출 (Vercel 환경변수 사용)
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${OPENAI_API_KEY}`
+                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}` // 중요: 환경변수 설정 필요
             },
             body: JSON.stringify({
-                model: "gpt-4o-mini", // 저렴하고 빠른 모델 사용
+                model: "gpt-4o-mini",
                 messages: [
-                    { role: "system", content: "당신은 심도 깊은 사주 분석 전문가입니다." },
-                    { role: "user", content: prompt }
+                    { role: "system", content: "당신은 전문 명리학자입니다. 사용자의 질문에 1단계(시간검증), 2단계(일주확정), 3단계(분석) 순서로 답하세요." },
+                    { role: "user", content: `이름: ${userData.name}, 생년월일: ${userData.birthdate}, 시간: ${userData.birthtime}, 구분: ${userData.calendar} 분석해줘.` }
                 ],
-                temperature: 0.7 // 창의성과 정확성의 균형
+                temperature: 0.7
             })
         });
+const data = await response.json();
+        const resultText = data.choices[0].message.content;
 
-        const result = await response.json();
-        return result.choices[0].message.content;
+        // 3. 성공 응답 보냄
+        res.status(200).json({ result: resultText });
+
     } catch (error) {
-        console.error("API 호출 오류:", error);
-        return "죄송합니다. 운세를 불러오는 중에 오류가 발생했습니다.";
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
