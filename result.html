@@ -1,34 +1,53 @@
-<div class="result-container">
-    <h2>✨ 당신의 운명 분석 리포트</h2>
-    
-    <div id="loading" class="loading-box">
-        <p>밤하늘의 별자리를 분석 중입니다...</p>
-        <div class="spinner"></div>
-    </div>
-
-    <div id="content" style="display: none;">
-        <div id="analysis-result" class="analysis-text">
-            </div>
-        <button onclick="location.href='index.html'" class="retry-btn">다시 하기</button>
-    </div>
+<div id="loading" class="loading-box">
+    <div class="spinner"></div>
+    <p id="loading-text">밤하늘의 기운을 모으는 중입니다...</p>
 </div>
 
 <script type="module">
     import { fetchSajuAnalysis } from './api/analyze.js';
 
+    // 로딩 메시지 리스트
+    const loadingMessages = [
+        "밤하늘의 기운을 모으는 중입니다...",
+        "생년월일시의 간지를 계산하고 있습니다...",
+        "야자시 적용 여부를 정밀하게 확인 중입니다...",
+        "귀하의 핵심 기둥인 '일주'를 분석하고 있습니다...",
+        "오행의 조화를 살피며 운세를 풀이하는 중입니다...",
+        "명리학적 데이터를 바탕으로 리포트를 생성하고 있습니다..."
+    ];
+
     window.onload = async () => {
-        // 1. 이전 페이지에서 저장한 데이터 가져오기
-const userData = JSON.parse(localStorage.getItem('sajuData'));
+        const userData = JSON.parse(localStorage.getItem('sajuData'));
+        if (!userData) { location.href = 'index.html'; return; }
 
-const response = await fetch('/api/analyze', { // Vercel은 /api/파일명이 곧 주소입니다.
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData)
-});
+        // --- 메시지 변경 애니메이션 시작 ---
+        let msgIndex = 0;
+        const msgElement = document.getElementById('loading-text');
+        
+        const msgInterval = setInterval(() => {
+            msgIndex = (msgIndex + 1) % loadingMessages.length;
+            msgElement.innerText = loadingMessages[msgIndex];
+        }, 2500); // 2.5초마다 메시지 교체
+        // ------------------------------------
 
-const data = await response.json();
-document.getElementById('analysis-result').innerText = data.result;
+        try {
+            // 실제 API 호출
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+            const data = await response.json();
+
+            // 메시지 변경 중지 및 결과 표시
+            clearInterval(msgInterval);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            document.getElementById('analysis-result').innerText = data.result;
+
+        } catch (error) {
+            clearInterval(msgInterval);
+            msgElement.innerText = "오류가 발생했습니다. 다시 시도해 주세요.";
+        }
     };
 </script>
-
-

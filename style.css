@@ -82,3 +82,24 @@ input[type="text"], input[type="date"], select {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+/* 로딩 텍스트 스타일 */
+#loading-text {
+    font-size: 1rem;
+    color: #8b0000;
+    font-weight: 500;
+    margin-top: 15px;
+    transition: all 0.5s ease-in-out;
+    /* 텍스트가 바뀔 때 부드러운 애니메이션 효과 */
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+.loading-box {
+    text-align: center;
+    padding: 50px 0;
+}
