@@ -55,11 +55,11 @@ export default async function handler(req, res) {
                 messages: [
                     { 
                         role: "system", 
-                        content: "당신은 전문 명리학자입니다. 사용자의 정보를 바탕으로 1단계, 2단계, 3단계 순으로 상세히 답하세요." 
+                        content: "당신은 전문 명리학자입니다. 사용자의 정보를 바탕으로 상세히 답하세요." 
                     },
                     { 
                         role: "user", 
-                        content: `이름: ${userData.name}, 성별: ${userData.gender}, 생년월일: ${userData.birthdate}, 시간: ${userData.birthtime}, 구분: ${userData.calendar} 분석 시작해줘.` 
+                        content: `이름: ${userData.name}, 성별: ${userData.gender}, 생년월일: ${userData.birthdate}, 시간: ${userData.birthtime}, 구분: ${userData.calendar} 분석 시작해주세요.` 
                     }
                 ],
                 temperature: 0.3 // 일관된 분석을 위해 낮은 수치 권장
