@@ -22,7 +22,7 @@ body {
 /* 이미지 섹션 */
 .main-header { text-align: center; margin-bottom: 30px; }
 .main-image {
-    width: 120px;
+    width: 50px;
     height: auto;
     margin-bottom: 15px;
     /* 이미지가 없을 경우를 대비해 둥근 배경 처리 가능 */
