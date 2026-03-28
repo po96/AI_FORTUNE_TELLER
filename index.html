@@ -10,7 +10,7 @@
     <div class="container">
         <header class="main-header">
             <img src="images/main-logo.png" alt="사주 로고" class="main-image">
-            <h1>운명의 흐름, 사주풀이</h1>
+            <h1> AI가 분석하는 당신의 사주풀이</h1>
             <p>태어난 순간의 기운을 분석하여 당신의 길을 안내합니다.</p>
         </header>
 
@@ -85,18 +85,33 @@
 				monthSelect.add(new Option(i + "월", i.toString().padStart(2, '0')));
 			}
 
-			// 일 생성 (기본 31일)
-			for (let i = 1; i <= 31; i++) {
-				daySelect.add(new Option(i + "일", i.toString().padStart(2, '0')));
-			}
-		};
+			// 일 업데이트 함수 (윤년 계산 포함)
+			function updateDays() {
+				const year = parseInt(yearSelect.value);
+				const month = parseInt(monthSelect.value);
+				const lastDay = new Date(year, month, 0).getDate(); // 해당 월의 마지막 날 계산
 
-		// 폼 제출 시 hidden input에 YYYY-MM-DD 형식으로 결합
-		document.querySelector('form').onsubmit = function() {
-			const y = document.getElementById('year').value;
-			const m = document.getElementById('month').value;
-			const d = document.getElementById('day').value;
-			document.getElementById('birthdate').value = `${y}-${m}-${d}`;
+				// 기존 일 옵션 초기화
+				const currentSelectedDay = daySelect.value;
+				daySelect.innerHTML = "";
+
+				for (let i = 1; i <= lastDay; i++) {
+					const dayValue = i.toString().padStart(2, '0');
+					daySelect.add(new Option(i + "일", dayValue));
+				}
+
+				// 이전에 선택했던 날짜가 유효하면 유지
+				if (currentSelectedDay <= lastDay) {
+					daySelect.value = currentSelectedDay;
+				}
+			}
+
+			// 연도나 월이 바뀌면 일(day) 리스트를 갱신
+			yearSelect.addEventListener('change', updateDays);
+			monthSelect.addEventListener('change', updateDays);
+
+			// 초기 실행
+			updateDays();
 		};
     </script>
 </body>
