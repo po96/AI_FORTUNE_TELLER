@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>명품 사주풀이 - 당신의 운명을 확인하세요</title>
+    <title>AI 사주풀이 - 당신의 운명을 확인하세요</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -29,10 +29,15 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="birthdate">생년월일</label>
-                    <input type="date" id="birthdate" name="birthdate" required>
-                </div>
+				<div class="form-group">
+					<label>생년월일</label>
+					<div style="display: flex; gap: 10px;">
+						<select id="year" name="year" required></select>
+						<select id="month" name="month" required></select>
+						<select id="day" name="day" required></select>
+					</div>
+					<input type="hidden" id="birthdate" name="birthdate">
+				</div>
 
                 <div class="form-group">
                     <label for="calendar">양력/음력</label>
@@ -63,6 +68,36 @@
         document.getElementById('sajuForm').addEventListener('submit', function(e) {
             // 필요 시 데이터 가공 로직 추가
         });
+	// 페이지 로드 시 연/월/일 옵션 생성
+		window.onload = () => {
+			const yearSelect = document.getElementById('year');
+			const monthSelect = document.getElementById('month');
+			const daySelect = document.getElementById('day');
+
+			// 연도 생성 (1920 ~ 현재)
+			const currentYear = new Date().getFullYear();
+			for (let i = currentYear; i >= 1920; i--) {
+				yearSelect.add(new Option(i + "년", i));
+			}
+
+			// 월 생성
+			for (let i = 1; i <= 12; i++) {
+				monthSelect.add(new Option(i + "월", i.toString().padStart(2, '0')));
+			}
+
+			// 일 생성 (기본 31일)
+			for (let i = 1; i <= 31; i++) {
+				daySelect.add(new Option(i + "일", i.toString().padStart(2, '0')));
+			}
+		};
+
+		// 폼 제출 시 hidden input에 YYYY-MM-DD 형식으로 결합
+		document.querySelector('form').onsubmit = function() {
+			const y = document.getElementById('year').value;
+			const m = document.getElementById('month').value;
+			const d = document.getElementById('day').value;
+			document.getElementById('birthdate').value = `${y}-${m}-${d}`;
+		};
     </script>
 </body>
 </html>

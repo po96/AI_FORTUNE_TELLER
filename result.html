@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <title>사주 분석 결과 - 당신의 운명</title>
     <link rel="stylesheet" href="style.css">
     <style>
@@ -146,24 +147,25 @@
             }
         };
 
-        // 타이핑 효과 함수
-        function typeWriter(text, elementId) {
-            let i = 0;
-            const speed = 25; // 타이핑 속도 (낮을수록 빠름)
-            const element = document.getElementById(elementId);
-            element.innerText = ""; // 초기화
 
-            function type() {
-                if (i < text.length) {
-                    element.innerText += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                    // 글자가 써지면서 자동으로 화면 하단으로 스크롤
-                    if(i % 5 === 0) window.scrollTo(0, document.body.scrollHeight);
-                }
-            }
-            type();
-        }
+		function typeWriter(text, elementId) {
+				let i = 0;
+				const speed = 20;
+				const element = document.getElementById(elementId);
+				let currentText = "";
+
+				function type() {
+					if (i < text.length) {
+						currentText += text.charAt(i);
+						// marked.parse()를 이용해 실시간으로 HTML로 변환하여 출력
+						element.innerHTML = marked.parse(currentText);
+						i++;
+						setTimeout(type, speed);
+						if(i % 5 === 0) window.scrollTo(0, document.body.scrollHeight);
+					}
+				}
+				type();
+			}
     </script>
 </body>
 </html>
