@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
     try {
         const userData = req.body;
-		const prompt = `
+		const detailPrompt = `
 		당신은 20년 경력의 전문 명리학자입니다. 아래 사용자의 정보를 바탕으로 단계별 사주 분석을 수행하세요.
 		
 		[사용자 정보]
@@ -55,7 +55,7 @@ export default async function handler(req, res) {
                 messages: [
                     { 
                         role: "system", 
-                        content: "당신은 전문 명리학자입니다. 사용자의 정보를 바탕으로 상세히 답하세요." 
+                        content: detailPrompt // <--- 위에서 만든 상세 지침이 여기 들어갑니다.
                     },
                     { 
                         role: "user", 
