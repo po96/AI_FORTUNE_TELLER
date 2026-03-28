@@ -41,31 +41,32 @@
             msgElement.innerText = loadingMessages[msgIndex];
         }, 2000);
 
-try {
-    const response = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-    });
+        try {
+			const response = await fetch('/api/analyze', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(userData)
+			});
 
-    const data = await response.json();
+			const data = await response.json();
 
-    if (data.result) {
-        // 로딩창 숨기기
-        clearInterval(msgInterval);
-        document.getElementById('loading').style.display = 'none';
-        
-        // 결과창 보이기
-        const contentArea = document.getElementById('content');
-        const resultArea = document.getElementById('analysis-result');
-        
-        contentArea.style.display = 'block';
-        
-        // [중요] 텍스트가 줄바꿈을 유지하며 나타나도록 설정
-        resultArea.innerText = data.result; 
-        // 만약 HTML 태그로 해석하고 싶다면 라이브러리(marked.js 등)를 써야 하지만, 
-        // 우선은 innerText와 CSS의 white-space: pre-wrap 조합이 가장 안전합니다.
-    } catch (error) {
+			if (data.result) {
+				// 로딩창 숨기기
+				clearInterval(msgInterval);
+				document.getElementById('loading').style.display = 'none';
+				
+				// 결과창 보이기
+				const contentArea = document.getElementById('content');
+				const resultArea = document.getElementById('analysis-result');
+				
+				contentArea.style.display = 'block';
+				
+				// [중요] 텍스트가 줄바꿈을 유지하며 나타나도록 설정
+				resultArea.innerText = data.result; 
+				// 만약 HTML 태그로 해석하고 싶다면 라이브러리(marked.js 등)를 써야 하지만, 
+				// 우선은 innerText와 CSS의 white-space: pre-wrap 조합이 가장 안전합니다.
+			}
+		} catch (error) {
             console.error(error);
             clearInterval(msgInterval);
             msgElement.innerText = "분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
