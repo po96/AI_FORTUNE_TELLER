@@ -27,7 +27,7 @@ body {
     margin-bottom: 15px;
     /* 이미지가 없을 경우를 대비해 둥근 배경 처리 가능 */
 }
-.main-header h1 { font-size: 1.5rem; margin-bottom: 10px; color: #8b0000; }
+.main-header h1 { font-size: 1.4rem; margin-bottom: 10px; color: #8b0000; }
 .main-header p { font-size: 0.9rem; color: #666; }
 
 /* 폼 스타일 */
@@ -149,4 +149,48 @@ label {
     font-weight: bold;
     margin-bottom: 8px;
     color: #444;
+}
+/* 마크다운 결과물 상세 스타일링 */
+.analysis-text h1, .analysis-text h2, .analysis-text h3 {
+    color: #8b0000; /* 깊은 붉은색으로 강조 */
+    margin-top: 25px;
+    margin-bottom: 12px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #f0e6e6; /* 제목 아래 은은한 선 */
+}
+
+.analysis-text h3 {
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+}
+
+/* 제목 앞에 작은 심볼 추가 (선택 사항) */
+.analysis-text h3::before {
+    content: "•";
+    margin-right: 8px;
+    color: #ccaa44; /* 금색 포인트 */
+}
+
+.analysis-text strong {
+    color: #222;
+    background: linear-gradient(to top, #ffe6e6 40%, transparent 40%); /* 형광펜 효과 */
+    padding: 0 2px;
+    font-weight: 700;
+}
+
+.analysis-text p {
+    margin-bottom: 15px;
+    color: #444;
+    word-break: keep-all; /* 단어 단위 줄바꿈으로 깔끔하게 */
+}
+
+/* 리스트 스타일 (만약 GPT가 목록을 쓴다면) */
+.analysis-text ul, .analysis-text ol {
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+.analysis-text li {
+    margin-bottom: 8px;
 }
