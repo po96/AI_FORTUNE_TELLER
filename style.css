@@ -56,16 +56,7 @@ input[type="text"], input[type="date"], select {
     transition: background 0.3s;
 }
 .submit-btn:hover { background-color: #a00000; }
-.analysis-text {
-    white-space: pre-wrap; /* GPT가 보낸 줄바꿈(Enter)을 그대로 유지 */
-    line-height: 1.8;
-    text-align: left;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid #eee;
-    margin-top: 20px;
-}
+
 
 .spinner {
     /* 간단한 로딩 애니메이션 */
@@ -102,4 +93,23 @@ input[type="text"], input[type="date"], select {
 .loading-box {
     text-align: center;
     padding: 50px 0;
+}
+
+.analysis-text {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    line-height: 1.8;      /* 줄 간격을 넓게 해서 가독성 확보 */
+    white-space: pre-wrap; /* GPT가 보낸 엔터(줄바꿈)를 화면에 그대로 반영 */
+    word-break: break-all;
+    border: 1px solid #e0dcd0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    font-size: 1.05rem;
+    color: #333;
+}
+
+/* GPT가 제목으로 쓰는 부분(### 등)이 있다면 눈에 띄게 */
+.analysis-text b, .analysis-text strong {
+    color: #8b0000;
+    font-weight: 700;
 }
