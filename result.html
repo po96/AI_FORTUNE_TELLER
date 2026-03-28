@@ -1,75 +1,169 @@
 <!DOCTYPE html>
 <html lang="ko">
-<div id="loading" class="loading-box">
-    <div class="spinner"></div>
-    <p id="loading-text">밤하늘의 기운을 모으는 중입니다...</p>
-</div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사주 분석 결과 - 당신의 운명</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 결과 페이지 전용 추가 스타일 */
+        .result-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .loading-box {
+            padding: 50px 0;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #8b0000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        #loading-text {
+            color: #8b0000;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 1.5em;
+        }
 
-<script>
-    // 로딩 메시지 리스트 (기존과 동일)
-    const loadingMessages = [
-        "밤하늘의 기운을 모으는 중입니다...",
-        "생년월일시의 간지를 계산하고 있습니다...",
-        "야자시 적용 여부를 정밀하게 확인 중입니다...",
-        "귀하의 핵심 기둥인 '일주'를 분석하고 있습니다...",
-        "명리학적 데이터를 바탕으로 리포트를 생성하고 있습니다..."
-    ];
+        .analysis-text {
+            text-align: left;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            line-height: 1.8;
+            white-space: pre-wrap; /* 줄바꿈 유지 */
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            font-size: 1.05rem;
+            margin-bottom: 30px;
+        }
 
-    window.onload = async () => {
-        // [수정 포인트] 주소창(URL)에서 파라미터 추출
-        const urlParams = new URLSearchParams(window.location.search);
-        const userData = {
-            name: urlParams.get('name'),
-            gender: urlParams.get('gender'),
-            birthdate: urlParams.get('birthdate'),
-            calendar: urlParams.get('calendar'),
-            birthtime: urlParams.get('birthtime')
+        .retry-btn {
+            background-color: #333;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+        .retry-btn:hover { background-color: #000; }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <header>
+            <h1>✨ 당신의 운명 분석 리포트</h1>
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+        </header>
+
+        <div id="loading-section" class="loading-box">
+            <div class="spinner"></div>
+            <p id="loading-text">기운을 모으는 중입니다...</p>
+        </div>
+
+        <div id="result-section" style="display: none;">
+            <div id="analysis-result" class="analysis-text">
+                </div>
+            <button onclick="location.href='index.html'" class="retry-btn">다시 분석하기</button>
+        </div>
+    </div>
+
+    <script>
+        const loadingMessages = [
+            "하늘의 기운을 살피는 중입니다...",
+            "생년월일시의 간지를 계산하고 있습니다...",
+            "야자시 적용 여부를 정밀하게 확인 중입니다...",
+            "귀하의 핵심 기둥인 '일주'를 확정하고 있습니다...",
+            "오행의 조화를 분석하여 결과를 정리 중입니다...",
+            "거의 다 되었습니다. 잠시만 기다려 주세요..."
+        ];
+
+        window.onload = async () => {
+            // 1. URL 파라미터에서 사용자 정보 가져오기
+            const urlParams = new URLSearchParams(window.location.search);
+            const userData = {
+                name: urlParams.get('name'),
+                gender: urlParams.get('gender'),
+                birthdate: urlParams.get('birthdate'),
+                calendar: urlParams.get('calendar'),
+                birthtime: urlParams.get('birthtime')
+            };
+
+            // 데이터 체크
+            if (!userData.name || !userData.birthdate) {
+                alert("정보가 부족합니다. 다시 입력해 주세요.");
+                location.href = 'index.html';
+                return;
+            }
+
+            // 2. 로딩 메시지 순환 시작
+            let msgIdx = 0;
+            const msgEl = document.getElementById('loading-text');
+            const msgInterval = setInterval(() => {
+                msgIdx = (msgIdx + 1) % loadingMessages.length;
+                msgEl.innerText = loadingMessages[msgIdx];
+            }, 2500);
+
+            try {
+                // 3. API 호출 (상대 경로 사용)
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "분석 실패");
+                }
+
+                const data = await response.json();
+
+                // 4. 로딩 중단 및 결과 표시
+                clearInterval(msgInterval);
+                document.getElementById('loading-section').style.display = 'none';
+                document.getElementById('result-section').style.display = 'block';
+
+                // 5. 타이핑 효과로 결과 출력
+                typeWriter(data.result, 'analysis-result');
+
+            } catch (error) {
+                console.error("Error:", error);
+                clearInterval(msgInterval);
+                msgEl.style.color = "red";
+                msgEl.innerText = "오류가 발생했습니다: " + error.message;
+            }
         };
 
-        // 데이터가 하나라도 없으면 메인으로 리다이렉트
-        if (!userData.name || !userData.birthdate) {
-            alert("입력 데이터가 없습니다. 메인으로 이동합니다.");
-            location.href = 'index.html';
-            return;
+        // 타이핑 효과 함수
+        function typeWriter(text, elementId) {
+            let i = 0;
+            const speed = 25; // 타이핑 속도 (낮을수록 빠름)
+            const element = document.getElementById(elementId);
+            element.innerText = ""; // 초기화
+
+            function type() {
+                if (i < text.length) {
+                    element.innerText += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                    // 글자가 써지면서 자동으로 화면 하단으로 스크롤
+                    if(i % 5 === 0) window.scrollTo(0, document.body.scrollHeight);
+                }
+            }
+            type();
         }
-
-        // --- 메시지 애니메이션 (기존과 동일) ---
-        let msgIndex = 0;
-        const msgElement = document.getElementById('loading-text');
-        const msgInterval = setInterval(() => {
-            msgIndex = (msgIndex + 1) % loadingMessages.length;
-            msgElement.innerText = loadingMessages[msgIndex];
-        }, 2000);
-
-        try {
-			const response = await fetch('/api/analyze', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(userData)
-			});
-
-			const data = await response.json();
-
-			if (data.result) {
-				// 로딩창 숨기기
-				clearInterval(msgInterval);
-				document.getElementById('loading').style.display = 'none';
-				
-				// 결과창 보이기
-				const contentArea = document.getElementById('content');
-				const resultArea = document.getElementById('analysis-result');
-				
-				contentArea.style.display = 'block';
-				
-				// [중요] 텍스트가 줄바꿈을 유지하며 나타나도록 설정
-				resultArea.innerText = data.result; 
-				// 만약 HTML 태그로 해석하고 싶다면 라이브러리(marked.js 등)를 써야 하지만, 
-				// 우선은 innerText와 CSS의 white-space: pre-wrap 조합이 가장 안전합니다.
-			}
-		} catch (error) {
-            console.error(error);
-            clearInterval(msgInterval);
-            msgElement.innerText = "분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
-        }
-    };
-</script>
+    </script>
+</body>
+</html>
