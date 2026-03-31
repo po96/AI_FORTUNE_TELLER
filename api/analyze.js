@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     try {
         const userData = req.body;
 		const detailPrompt = `
-		당신은 20년 경력의 전문 명리학자입니다. 아래 사용자의 정보를 바탕으로 단계별 사주 분석을 수행하세요.
+		당신은 30년 경력의 전문 명리학자입니다. 아래 사용자의 정보를 바탕으로 단계별 사주 분석을 수행하세요.
 		
 		[사용자 정보]
 		- 이름: ${userData.name}
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 		- 태어난 시간: ${userData.birthtime}
 
 		[요청 사항]
-		1단계 [시간 적용 확인]: 한국 표준시와 야자시(23:30~00:30) 기준을 적용하여 날짜 변경 여부를 논리적으로 설명하세요.
+		1단계 [시간 적용 확인]: 한국 표준시와 태어난 시간 ${userData.birthtime} 기준을 적용하여 날짜 변경 여부를 논리적으로 설명하세요.
 			 [일주 확정]: 위 기준을 적용한 정확한 일주(日柱)의 한자와 한글명을 확정하세요.
 			 [기본 분석]: 확정된 일주를 바탕으로 사용자의 타고난 성격, 특징, 조언을 상세히 서술하세요.
 		2단계 [기본 분석 요청]위 [1단계]에서 확정된 '일주(日柱)'를 기준으로, 다음 정보를 분석해 주세요.
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
                         content: detailPrompt 
                     }
                 ],
-                temperature: 0.3 // 일관된 분석을 위해 낮은 수치 권장
+                temperature: 0.7 // 일관된 분석을 위해 낮은 수치 권장
             })
         });
 
