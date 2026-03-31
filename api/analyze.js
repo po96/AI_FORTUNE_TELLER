@@ -55,11 +55,11 @@ export default async function handler(req, res) {
                 messages: [
                     { 
                         role: "system", 
-                        content: detailPrompt // <--- 위에서 만든 상세 지침이 여기 들어갑니다.
+                        content: `당신은 20년 경력의 전문 명리학자입니다. 아래 사용자의 정보를 바탕으로 단계별 사주 분석을 수행하세요. ` // <--- 위에서 만든 상세 지침이 여기 들어갑니다.
                     },
                     { 
                         role: "user", 
-                        content: `이름: ${userData.name}, 성별: ${userData.gender}, 생년월일: ${userData.birthdate}, 시간: ${userData.birthtime}, 구분: ${userData.calendar} 분석 시작해주세요.` 
+                        content: detailPrompt 
                     }
                 ],
                 temperature: 0.3 // 일관된 분석을 위해 낮은 수치 권장
